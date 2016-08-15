@@ -1,0 +1,45 @@
+buildscript {
+	ext {
+		springBootVersion = '1.4.0.RELEASE'
+		igorVersion = '1.51.0'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+apply plugin: 'groovy'
+apply plugin: 'eclipse'
+apply plugin: 'spring-boot'
+
+jar {
+	baseName = 'igor-app'
+	version = '0.0.1-SNAPSHOT'
+}
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+	mavenLocal()
+	mavenCentral()
+	jcenter()
+	maven { url "http://spinnaker.bintray.com/gradle" }
+}
+
+
+dependencies {
+	compile "com.netflix.spinnaker.igor:igor-web:${igorVersion}"
+	compile('org.codehaus.groovy:groovy')
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
+
+eclipse {
+	classpath {
+		 containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
+		 containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8'
+	}
+}
