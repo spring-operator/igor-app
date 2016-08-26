@@ -1,7 +1,8 @@
 buildscript {
 	ext {
-		springBootVersion = '1.4.0.RELEASE'
+		springBootVersion = '1.2.8.RELEASE'
 		igorVersion = '1.51.0'
+		igorAppVersion = '0.0.1.BUILD-SNAPSHOT'
 	}
 	repositories {
 		mavenCentral()
@@ -17,8 +18,16 @@ apply plugin: 'spring-boot'
 
 jar {
 	baseName = 'igor-app'
-	version = '0.0.1-SNAPSHOT'
+	version = igorAppVersion
 }
+
+/**
+ * No need to create your own Main. Simply use the one provided upstream.
+ */
+springBoot {
+	mainClass = 'com.netflix.spinnaker.igor.Main'
+}
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -36,6 +45,16 @@ dependencies {
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 
+/**
+ * Let's pin everything to the version of Spring Boot selected at the top
+ */
+configurations.all {
+	resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+		if (details.requested.group == 'org.springframework.boot') {
+			details.useVersion springBootVersion
+		}
+	}
+}
 
 eclipse {
 	classpath {
