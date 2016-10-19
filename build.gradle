@@ -2,7 +2,7 @@ buildscript {
 	ext {
 		springBootVersion = '1.2.8.RELEASE'
 		igorVersion = '1.54.0'
-		igorAppVersion = '0.0.1.BUILD-SNAPSHOT'
+		igorAppVersion = '1.0.0.BUILD-SNAPSHOT'
 	}
 	repositories {
 		mavenCentral()
