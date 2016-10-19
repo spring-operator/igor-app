@@ -1,7 +1,7 @@
 buildscript {
 	ext {
 		springBootVersion = '1.2.8.RELEASE'
-		igorVersion = '1.51.0'
+		igorVersion = '1.54.0'
 		igorAppVersion = '0.0.1.BUILD-SNAPSHOT'
 	}
 	repositories {
@@ -15,6 +15,7 @@ buildscript {
 apply plugin: 'groovy'
 apply plugin: 'eclipse'
 apply plugin: 'spring-boot'
+apply plugin: 'maven-publish'
 
 jar {
 	baseName = 'igor-app'
@@ -41,8 +42,6 @@ repositories {
 
 dependencies {
 	compile "com.netflix.spinnaker.igor:igor-web:${igorVersion}"
-	compile('org.codehaus.groovy:groovy')
-	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 
 /**
@@ -60,5 +59,56 @@ eclipse {
 	classpath {
 		 containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
 		 containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8'
+	}
+}
+
+// make sure bootRepackage is included in task graph
+project.tasks.findAll { it.name.startsWith("publish") } .each { it.dependsOn assemble }
+
+/**
+ * To publish echo-app to an artifactory repository, do this:
+ *
+ * USERNAME=<username> PASSWORD=<password> ./gradlew publish
+ */
+publishing {
+	repositories {
+		if ("${igorAppVersion}".endsWith(".BUILD-SNAPSHOT")) {
+			println "Adding libs-snapshot-local repo as target for publishing maven artifacts..."
+			maven {
+				url "https://repo.spring.io/libs-snapshot-local"
+				credentials {
+					username System.getenv()['USERNAME']
+					password System.getenv()['PASSWORD']
+				}
+			}
+		} else if ("${igorAppVersion}".endsWith(".RELEASE")) {
+			println "Adding libs-release-local repo as target for publishing maven artifacts..."
+			maven {
+				url "https://repo.spring.io/libs-release-local"
+				credentials {
+					username System.getenv()['USERNAME']
+					password System.getenv()['PASSWORD']
+				}
+			}
+		} else {
+			println "Adding libs-milestone-local repo as target for publishing maven artifacts..."
+			maven {
+				url "https://repo.spring.io/libs-milestone-local"
+				credentials {
+					username System.getenv()['USERNAME']
+					password System.getenv()['PASSWORD']
+				}
+			}
+		}
+	}
+
+	publications {
+		maven(MavenPublication) {
+			groupId 'org.springframework.cloud'
+			artifactId 'igor-app'
+			version "${igorAppVersion}"
+
+			artifact ("$buildDir/libs/${project.name}-${igorAppVersion}.jar")
+		}
 	}
 }
