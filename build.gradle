@@ -53,6 +53,8 @@ configurations.all {
 			details.useVersion springBootVersion
 		}
 	}
+	exclude group: 'javax.servlet', module: 'servlet-api'
+	exclude group: 'javax.ws.rs', module: 'jsr311-api'
 }
 
 eclipse {
